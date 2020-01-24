@@ -1,0 +1,21 @@
+title: visualisation des barrages du projet CGEDD de Pascal Kosuth
+path: /barrages
+doc: |
+  Utilisation de fusioncharts-suite-xt pour faire les graphiques
+  
+journal: |
+  24/1/2020:
+    création
+    première version publiée et envoyée à Pascal
+    
+phpScripts:
+  - /barrages/index.php
+  - /barrages/fiche.php
+  - /barrages/gazet.php
+  - /barrages/map.php
+  - /barrages/geojson.php
+  - /barrages/charteg.php
+  - /barrages/linecharteg.php
+phpIncludes:
+htmlFiles:
+  - /barrages/adr.sql
