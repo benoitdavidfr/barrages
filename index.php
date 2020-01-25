@@ -17,7 +17,9 @@ et seul le graphique du réservoir de l'Astarac est disponible.
   <li><a href='map.php'>carte des barrages</a></li>
   <li><a href='gazet.php'>liste des barrages</a></li>
 </ul>
-<h3>URL de test</h3>
+<h3>Divers</h3>
 <ul>
-  <li><a href='geojson.php'>GeoJSON des barrages</a></li>
+  <li><a href='geojson.php'>Test GeoJSON des barrages</a></li>
+  <li><a href='https://github.com/benoitdavidfr/barrages'>Github associé</a></li>
+  <li><a href='https://www.fusioncharts.com/charts#fusioncharts'>Bibliothèque fusioncharts</a></li>
 </ul>

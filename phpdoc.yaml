@@ -8,6 +8,9 @@ doc: |
   Synchro: http://localhost/synchro.php?remote=http://bdavid.alwaysdata.net/&dir=barrages
   Sources: https://github.com/benoitdavidfr/barrages
 journal: |
+  25/1/2020 18:25:
+    amélioration des graphiques
+    amélioration de la carte
   25/1/2020:
     ajout d'une page d'accueil et d'une page avec la liste des barrages
     renommage de fiche.php en chart.php

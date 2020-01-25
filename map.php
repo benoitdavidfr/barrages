@@ -61,8 +61,8 @@ elseif (isset($_GET['lon']) && isset($_GET['lat']) && isset($_GET['level'])) {
 }
 else  {
   $lon = 1;
-  $lat = 47;
-  $level = 6; // variable utilisé dans le code JavaScript pour définir la vue
+  $lat = 45;
+  $level = 7; // variable utilisé dans le code JavaScript pour définir la vue
 }
 $center = json_encode([$lat, $lon]); // variable utilisé dans le code JavaScript pour définir la vue
 
@@ -140,6 +140,12 @@ var baseLayers = {
 };
 
 var overlays = {
+  "Hydrographie" : new L.TileLayer(
+    'http://igngp.geoapi.fr/tile.php/hydrographie/{z}/{x}/{y}.png',
+    { format: 'image/png', minZoom: 6, maxZoom: 18, detectRetina: true,
+      attribution: attrIGN
+    }
+  ),
   "Parcelles cadastrales (orange)" : new L.TileLayer(
       wmtsurl + '&layer=CADASTRALPARCELS.PARCELS&format=image/png&style=bdparcellaire_o',
       {"format":"image/png","minZoom":0,"maxZoom":20,"attribution":attrIGN}
@@ -148,13 +154,21 @@ var overlays = {
       wmtsurl + '&layer=GEOGRAPHICALGRIDSYSTEMS.MAPS.BDUNI.J1&format=image/png&style=normal',
       {"format":"image/png","minZoom":0,"maxZoom":20,"attribution":attrIGN}
   ),
-  "barrages" : new L.GeoJSON.AJAX(<?php echo $pointspath; ?>, {
+  "Barrages" : new L.GeoJSON.AJAX(<?php echo $pointspath; ?>, {
     style: { color: 'blue'}, minZoom: 0, maxZoom: 21, onEachFeature: onEachFeature
   }),
+  "Dénominations géographiques" : new L.TileLayer(
+    'http://igngp.geoapi.fr/tile.php/toponymes/{z}/{x}/{y}.png',
+    { format: 'image/png', minZoom: 6, maxZoom: 18, detectRetina: false,
+      attribution: attrIGN
+    }
+  ),
 };
       
-map.addLayer(baseLayers["Plan IGN V2"]);
-map.addLayer(overlays["barrages"]);
+map.addLayer(baseLayers["Altitude"]);
+map.addLayer(overlays["Hydrographie"]);
+map.addLayer(overlays["Barrages"]);
+map.addLayer(overlays["Dénominations géographiques"]);
 
 L.control.layers(baseLayers, overlays).addTo(map);
 
