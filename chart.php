@@ -1,8 +1,17 @@
 <?php
 /*PhpDoc:
-name: fiche.php
-title: fiche.php - fiche affichée par barrage
-
+name: chart.php
+title: chart.php - graphique des données associées à un barrage
+doc:
+  En paramètre le numéro du barrage.
+  On utilise le nom défini dans le fichier des barrages pour fabriquer le nom du fichier CSV contenant les observations
+  Dans un premier temps seules les données de la retenue d4Astarac sont disponibles.
+  On considère que le fichier des données contient:
+   - en première ligne le nom du barrage.
+   - en seconde ligne les en-têtes des colonnes
+   - les données dans les autres lignes
+  Le graphique affiché est celui de la côte en mètres.
+  Pour faire les graphiques, utilisation de fusioncharts-suite-xt (https://www.fusioncharts.com/charts#fusioncharts)
 */
 
 if (!isset($_GET['num']))
@@ -51,7 +60,7 @@ while ($record = fgetcsv($file, 1024, ';', '"')) {
 
 <html>
 <head>
-<title>Line Chart</title>
+<title>graphique <?php echo $nom; ?></title>
 <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
 <script type="text/javascript" src="https://cdn.fusioncharts.com/fusioncharts/latest/themes/fusioncharts.theme.fusion.js"></script>
 </head>

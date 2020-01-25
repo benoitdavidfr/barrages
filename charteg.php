@@ -7,6 +7,13 @@
 <body>
   
 <?php
+/*PhpDoc:
+name: charteg.php
+title: charteg.php - exemple de graphique utilisant fusioncharts issu de la doc
+doc: |
+journal: |
+*/
+
 include __DIR__."/fusioncharts/fusioncharts.php";
 
 // Chart Def

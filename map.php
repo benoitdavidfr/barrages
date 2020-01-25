@@ -54,7 +54,12 @@ if (isset($_GET['bbox'])) {
   $lat = ($bbox[1]+$bbox[3])/2;
   $level = level($bbox); // variable utilisé dans le code JavaScript pour définir la vue
 }
-else {
+elseif (isset($_GET['lon']) && isset($_GET['lat']) && isset($_GET['level'])) {
+  $lon = floatval($_GET['lon']);
+  $lat = floatval($_GET['lat']);
+  $level = intval($_GET['level']); // variable utilisé dans le code JavaScript pour définir la vue
+}
+else  {
   $lon = 1;
   $lat = 47;
   $level = 6; // variable utilisé dans le code JavaScript pour définir la vue

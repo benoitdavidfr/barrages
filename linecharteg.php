@@ -7,6 +7,12 @@
 <body>
   
 <?php
+/*PhpDoc:
+name: linecharteg.php
+title: linecharteg.php - exemple de graphique utilisant fusioncharts issu de la doc
+doc: |
+journal: |
+*/
 include __DIR__."/fusioncharts/fusioncharts.php";
 
 // Chart Def

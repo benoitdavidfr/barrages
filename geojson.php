@@ -17,7 +17,7 @@ while ($record = fgetcsv($file, 1024, ';', '"')) {
   $coord = [floatval(str_replace(',','.',$rec['Lon'])), floatval(str_replace(',','.',$rec['Lat']))];
   $features[] = [
     'type'=> 'Feature',
-    'href'=> "<a href='fiche.php?num=$rec[Num]'><b>$rec[Nom]</b></a>",
+    'href'=> "<a href='chart.php?num=$rec[Num]'><b>$rec[Nom]</b></a>",
     'properties'=> $rec,
     'geometry'=> [
       'type'=> 'Point',

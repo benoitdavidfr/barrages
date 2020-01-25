@@ -1,16 +1,21 @@
 title: visualisation des barrages du projet CGEDD de Pascal Kosuth
 path: /barrages
 doc: |
+  Outil de visualisation du POC de Pascal Kosuth sur l'estimation du remplissage des barrages
   Utilisation de fusioncharts-suite-xt pour faire les graphiques
+  Les données sont dans le répertoire data
   
 journal: |
+  25/1/2020:
+    ajout d'une page d'accueil et d'une page avec la liste des barrages
+    renommage de fiche.php en chart.php
   24/1/2020:
     création
     première version publiée et envoyée à Pascal
     
 phpScripts:
   - /barrages/index.php
-  - /barrages/fiche.php
+  - /barrages/chart.php
   - /barrages/gazet.php
   - /barrages/map.php
   - /barrages/geojson.php
@@ -18,4 +23,3 @@ phpScripts:
   - /barrages/linecharteg.php
 phpIncludes:
 htmlFiles:
-  - /barrages/adr.sql
