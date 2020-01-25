@@ -4,11 +4,14 @@ doc: |
   Outil de visualisation du POC de Pascal Kosuth sur l'estimation du remplissage des barrages
   Utilisation de fusioncharts-suite-xt pour faire les graphiques
   Les données sont dans le répertoire data
-  
+  Publié: http://bdavid.alwaysdata.net/barrages/
+  Synchro: http://localhost/synchro.php?remote=http://bdavid.alwaysdata.net/&dir=barrages
+  Sources: https://github.com/benoitdavidfr/barrages
 journal: |
   25/1/2020:
     ajout d'une page d'accueil et d'une page avec la liste des barrages
     renommage de fiche.php en chart.php
+    Publication des sources sur Github
   24/1/2020:
     création
     première version publiée et envoyée à Pascal
