@@ -1,0 +1,41 @@
+title: données du POC Barrages
+path: /barrages/data
+doc: |
+  - Synthese-46-retenues-20200121-Occitanie.xlsx
+    barrages d'Occitanie transmis par Pascal vers le 21/1/2020
+    échantillon de barrages sur lequel Pascal teste ses traitements
+  - retenues-20200121-Occitanie.csv
+    CSV créé à partir de Synthese-46-retenues-20200121-Occitanie.xlsx avec modif légère du nom des champs
+  - exemple-retenue-Astarac.xlsx
+    exemple de schéma à réaliser pour un barrage, transmis par Pascal vers le 21/1/2020
+  - retenue-Astarac.csv
+    CSV créé à partir de exemple-retenue-Astarac.xlsx
+    puis adaptation des noms des champs Code, Nom, Lon et Lat
+  - AEAG ouvrages hydro .xlsx
+    fichier transmis le 31/1/2020 par Pascal
+    fichier de barrages sur Adour-Garonne (AEAG ouvrages hydro.xlsx : source EDF) :
+    peux-tu me dire comment je peux transformer les coordonnées des colonnes G et H en coordonnées compatibles
+    Géoportail ? J'imagine que c'est de l'UTM
+  - Barrages_France_20200131-QGIS.xlsx
+    fichier transmis le 31/1/2020 par Pascal
+    2 onglets:
+      - Barrages_15m_France
+        barrages de plus de 15 m en France
+      - Barrages_15m_Occitanie_NlAq
+        barrages de plus de 15 m en Occitanie et NlAq
+  - Barrages_15m_France_20200131.csv
+    export CSV de l'onglet Barrages_15m_France de Barrages_France_20200131-QGIS.xlsx
+    puis adaptation des noms des champs Code, Nom, Lon et Lat
+  - Barrages_15m_Occitanie_NlAq_20200131.csv
+    export CSV de l'onglet Barrages_15m_Occitanie_NlAq de Barrages_France_20200131-QGIS.xlsx
+    puis adaptation des noms des champs Code, Nom, Lon et Lat
+
+journal: |
+  1/2/2020:
+    création
+    
+submodules:
+phpScripts:
+phpIncludes:
+htmlFiles:
+

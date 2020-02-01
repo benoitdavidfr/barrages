@@ -1,0 +1,14 @@
+title: conversion de Lambert93 en coord. géo.
+path: /barrages/conversionL93
+doc: |
+  Rendu inutile par /gexplor/geotab/index.php
+journal: |
+  1/2/2020:
+    création
+    
+submodules:
+phpScripts:
+  - /barrages/conversionL93/conv.php
+phpIncludes:
+htmlFiles:
+

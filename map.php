@@ -5,8 +5,6 @@ title: map.php - Dessine une carte
 doc: |
   Prend en paramètres:
     - bbox rectangle englobant [ lonmin,latmin,lonmax,latmax ] à afficher (optionnel)
-    - insee : le code INSEE du département ou de la commune concernée (optionnel)
-    - voie: l'id_voie de la voie à afficher (optionnel)
 
   Il faudrait permettre de visualiser des marker situés au même endroit.
   Il existe des plug-ins comme https://github.com/jawj/OverlappingMarkerSpiderfier-Leaflet qui font ca
@@ -68,7 +66,43 @@ $center = json_encode([$lat, $lon]); // variable utilisé dans le code JavaScrip
 
 //echo "<pre>"; print_r($_SERVER); die;
 $path = dirname($_SERVER['PHP_SELF']);
-$pointspath = "'$path/geojson.php'"; // variable utilisée dans le code JS
+$geojsonLayers = [ // variable utilisée dans le code JS
+  "Barrages 15m France entière" => [
+    'path' => "geojson.php?file=Barrages_15m_France_20200131.csv",
+    'markerOptions' => [
+      'radius'=> 8,
+      'fillColor'=> "darkBlue",
+      'color'=> "#000",
+      'weight'=> 1,
+      'opacity'=> 1,
+      'fillOpacity'=> 0.8,
+    ],
+    'visibleByDefault' => true,
+  ],
+  "Barrages 15m Occitanie et Nelle Aquitaine" => [
+    'path' => "geojson.php?file=Barrages_15m_Occitanie_NlAq_20200131.csv",
+    'markerOptions' => [
+      'radius'=> 8,
+      'fillColor'=> "#ff7800",
+      'color'=> "#000",
+      'weight'=> 1,
+      'opacity'=> 1,
+      'fillOpacity'=> 0.8,
+    ],
+  ],
+  "Barrages extrait pour validation" => [
+    'path' => "geojson.php?file=retenues-20200121-Occitanie.csv",
+    'markerOptions' => [
+      'radius'=> 8,
+      'fillColor'=> "darkGreen",
+      'color'=> "#000",
+      'weight'=> 1,
+      'opacity'=> 1,
+      'fillOpacity'=> 0.8,
+    ],
+  ],
+];
+
 ?>
 
 <!DOCTYPE HTML><html>
@@ -129,13 +163,18 @@ var baseLayers = {
       wmtsurl + '&layer=GEOGRAPHICALGRIDSYSTEMS.MAPS&format=image/jpeg&style=normal',
       {"format":"image/jpeg","minZoom":0,"maxZoom":18,"attribution":attrIGN}
   ),
-  "Ortho-Photos" : new L.TileLayer(
+  "OSM" : new L.TileLayer(
+      'http://{s}.tile.osm.org/{z}/{x}/{y}.png',
+      { "format":"image/png", "minZoom":0,"maxZoom":19, "detectRetina": false,
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'}
+   ),
+   "Ortho-Photos" : new L.TileLayer(
       wmtsurl + '&layer=ORTHOIMAGERY.ORTHOPHOTOS&format=image/jpeg&style=normal',
-      {"format":"image/jpeg","minZoom":0,"maxZoom":20,"attribution":attrIGN}
+      {"format":"image/jpeg" ,"minZoom":0, "maxZoom":20, "attribution":attrIGN}
   ),
   "Altitude" : new L.TileLayer(
       wmtsurl + '&layer=ELEVATION.SLOPES&format=image/jpeg&style=normal',
-      {"format":"image/jpeg","minZoom":6,"maxZoom":14,"attribution":attrIGN}
+      {"format":"image/jpeg", "minZoom":6, "maxZoom":14, "attribution":attrIGN}
   ),
 };
 
@@ -154,9 +193,23 @@ var overlays = {
       wmtsurl + '&layer=GEOGRAPHICALGRIDSYSTEMS.MAPS.BDUNI.J1&format=image/png&style=normal',
       {"format":"image/png","minZoom":0,"maxZoom":20,"attribution":attrIGN}
   ),
-  "Barrages" : new L.GeoJSON.AJAX(<?php echo $pointspath; ?>, {
-    style: { color: 'blue'}, minZoom: 0, maxZoom: 21, onEachFeature: onEachFeature
-  }),
+<?php
+  // affichage des couches GeoJSON définies dans la variable Php $geojsonLayers
+  foreach ($geojsonLayers as $title => $layer) {
+    $markerOptions = json_encode($layer['markerOptions']);
+    echo <<<EOT
+  '$title' : new L.GeoJSON.AJAX(
+    '$layer[path]',
+    { pointToLayer: function (feature, latlng) {
+        return L.circleMarker(latlng, $markerOptions);
+      },
+      minZoom: 0, maxZoom: 21, onEachFeature: onEachFeature
+    }
+  ),
+
+EOT;
+  }
+?>
   "Dénominations géographiques" : new L.TileLayer(
     'http://igngp.geoapi.fr/tile.php/toponymes/{z}/{x}/{y}.png',
     { format: 'image/png', minZoom: 6, maxZoom: 18, detectRetina: false,
@@ -167,7 +220,12 @@ var overlays = {
       
 map.addLayer(baseLayers["Altitude"]);
 map.addLayer(overlays["Hydrographie"]);
-map.addLayer(overlays["Barrages"]);
+<?php
+foreach ($geojsonLayers as $title => $layer) {
+  if (isset($layer['visibleByDefault']) && $layer['visibleByDefault'])
+    echo "map.addLayer(overlays['$title']);\n";
+}
+?>
 map.addLayer(overlays["Dénominations géographiques"]);
 
 L.control.layers(baseLayers, overlays).addTo(map);

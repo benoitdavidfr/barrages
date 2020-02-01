@@ -2,13 +2,23 @@
 /*PhpDoc:
 name: geojson.php
 title: geojson.php - Expose en GeoJSON les barrages
-
+doc: |
+  Prend en paramètre file le nom du fichier CSV dans data
+journal: |
+  1/2/2020:
+    - ajout du paramètre file pour exposer différents fichiers CSV
 */
 
 $features = [];
 
-if (!($file = fopen(__DIR__."/data/retenues-20200121-Occitanie.csv",'r')))
-  die("Erreur ouverture du fichier retenues-20200121-Occitanie.csv");
+if (!isset($_GET['file'])) {
+  header('HTTP/1.1 404 Not Found');
+  die("Erreur paramètre file absent");
+}
+if (!($file = fopen(__DIR__."/data/$_GET[file]",'r'))) {
+  header('HTTP/1.1 404 Not Found');
+  die("Erreur ouverture du fichier $_GET[file]");
+}
 
 $header = fgetcsv($file, 1024, ';', '"');
 while ($record = fgetcsv($file, 1024, ';', '"')) {
@@ -17,7 +27,7 @@ while ($record = fgetcsv($file, 1024, ';', '"')) {
   $coord = [floatval(str_replace(',','.',$rec['Lon'])), floatval(str_replace(',','.',$rec['Lat']))];
   $features[] = [
     'type'=> 'Feature',
-    'href'=> "<a href='chart.php?num=$rec[Num]'><b>$rec[Nom]</b></a>",
+    'href'=> "<a href='chart.php?num=$rec[Code]'><b>$rec[Nom]</b></a>",
     'properties'=> $rec,
     'geometry'=> [
       'type'=> 'Point',

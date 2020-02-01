@@ -20,7 +20,7 @@ et seul le graphique du réservoir de l'Astarac est disponible.
 <h3>Divers</h3>
 <ul>
   <li><a href='geojson.php'>Test GeoJSON des barrages</a></li>
-  <li><a href='https://github.com/benoitdavidfr/barrages'>Github du code source</a></li>
+  <li><a href='https://github.com/benoitdavidfr/barrages' target='_blank'>Github du code source</a></li>
   <li><a href='https://www.fusioncharts.com/charts#fusioncharts'>Bibliothèque fusioncharts</a></li>
 <?php
 if ($_SERVER['HTTP_HOST'] == 'localhost') {

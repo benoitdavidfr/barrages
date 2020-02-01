@@ -4,10 +4,18 @@ doc: |
   Outil de visualisation du POC de Pascal Kosuth sur l'estimation du remplissage des barrages
   Utilisation de fusioncharts-suite-xt pour faire les graphiques
   Les données sont dans le répertoire data
+  La carte affiche 3 couches:
+    - les barrages de plus 15 m France entière
+    - ceux d'Occitanie et de Nll Aquitaine
+    - ceux utilisés pour la validation avec les données in situ
   Publié: http://bdavid.alwaysdata.net/barrages/
   Synchro: http://localhost/synchro.php?remote=http://bdavid.alwaysdata.net/&dir=barrages
   Sources: https://github.com/benoitdavidfr/barrages
 journal: |
+  1/2/2020:
+    - affichage dans la carte de 3 couches différentes avec une représentation carto correspondante
+      répondant à la demande du 31/1/2020
+    - création d'un phpdoc.yaml dans le module data pour tracer les fichiers
   25/1/2020 18:25:
     amélioration des graphiques
     amélioration de la carte
@@ -19,6 +27,9 @@ journal: |
     création
     première version publiée et envoyée à Pascal
     
+submodules:
+  - /barrages/data
+  - /barrages/conversionL93
 phpScripts:
   - /barrages/index.php
   - /barrages/chart.php
