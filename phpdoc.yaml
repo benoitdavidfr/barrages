@@ -1,9 +1,14 @@
 title: visualisation des barrages du projet CGEDD de Pascal Kosuth
 path: /barrages
 doc: |
-  Outil de visualisation du POC de Pascal Kosuth sur l'estimation du remplissage des barrages
+  Outil de visualisation du POC de Pascal Kosuth d'estimation du remplissage des barrages
   Utilisation de fusioncharts-suite-xt pour faire les graphiques
   Les données sont dans le répertoire data
+  Les fichiers CSV contenant les liste de barrages doivent comporter les champs suivants:
+    - Code : l'identifiant du barrage
+    - Nom : le libellé du barrage utilisé dans la carte
+    - Lat et Lon : latitude et longitude du barrage, utilisés pour générer le GeoJSON
+      
   La carte affiche 3 couches:
     - les barrages de plus 15 m France entière
     - ceux d'Occitanie et de Nll Aquitaine
@@ -15,6 +20,7 @@ journal: |
   1/2/2020:
     - affichage dans la carte de 3 couches différentes avec une représentation carto correspondante
       répondant à la demande du 31/1/2020
+    - affichage des 3 listes de barrages
     - création d'un phpdoc.yaml dans le module data pour tracer les fichiers
   25/1/2020 18:25:
     amélioration des graphiques
