@@ -10,13 +10,15 @@ doc: |
     - Lat et Lon : latitude et longitude du barrage, utilisés pour générer le GeoJSON
       
   La carte affiche 3 couches:
-    - les barrages de plus 15 m France entière
+    - les barrages de plus 15 m de hauteur France entière
     - ceux d'Occitanie et de Nll Aquitaine
     - ceux utilisés pour la validation avec les données in situ
   Publié: http://bdavid.alwaysdata.net/barrages/
   Synchro: http://localhost/synchro.php?remote=http://bdavid.alwaysdata.net/&dir=barrages
   Sources: https://github.com/benoitdavidfr/barrages
 journal: |
+  7-9/2/2020:
+    - affichage du graphique sur la même page dans map2.php
   1/2/2020:
     - affichage dans la carte de 3 couches différentes avec une représentation carto correspondante
       répondant à la demande du 31/1/2020

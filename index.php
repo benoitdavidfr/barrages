@@ -8,7 +8,7 @@ title: index.php - page d'accueil
 <head><title>POC barrages</title><meta charset="UTF-8"></head>
 <body>
 <h2>POC Barrages</h2>
-Version du 1/2/2020.</p>
+Version du 9/2/2020.</p>
 
 POC d'estimation par analyse d'images satellitaires du volume d'eau stocké dans les barrages
  - Pascal Kosuth - CGEDD.<br>
@@ -21,7 +21,8 @@ et 3 listes de barrages sont affichées :<ul>
 </ul>
 <h2>Menu</h2>
 <ul>
-  <li><a href='map.php'>carte des barrages</a></li>
+  <li><a href='map.php'>carte des barrages avec graphiques sur une page séparée</a></li>
+  <li><a href='map2.php'>carte des barrages avec graphiques sur la même page</a></li>
   <li><a href='gazet.php?file=Barrages_15m_France_20200131.csv'>liste des barrages 15m France entière</a></li>
   <li><a href='gazet.php?file=Barrages_15m_Occitanie_NlAq_20200131.csv'>
     liste des barrages 15m Occitanie et Nelle Aquitaine</a></li>
