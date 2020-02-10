@@ -12,11 +12,11 @@ journal: |
 $features = [];
 
 if (!isset($_GET['file'])) {
-  header('HTTP/1.1 404 Not Found');
+  header('HTTP/1.1 400 Bad Request');
   die("Erreur paramètre file absent");
 }
 if (!($file = fopen(__DIR__."/data/$_GET[file]",'r'))) {
-  header('HTTP/1.1 404 Not Found');
+  header('HTTP/1.1 400 Bad Request');
   die("Erreur ouverture du fichier $_GET[file]");
 }
 

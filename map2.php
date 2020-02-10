@@ -68,9 +68,37 @@ else  {
 $center = json_encode([$lat, $lon]); // variable utilisé dans le code JavaScript pour définir la vue
 
 //echo "<pre>"; print_r($_SERVER); die;
-$path = "http://$_SERVER[SERVER_NAME]".dirname($_SERVER['PHP_SELF']);
+$path = (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) ? 'https://' : 'http://')
+  .$_SERVER['SERVER_NAME']
+  .dirname($_SERVER['PHP_SELF'])
+    ."/chart2.php?"
+  .(isset($_GET['chart']) ? "chart=$_GET[chart]&" : '');
 //echo "path=$path<br>\n";
+$chart = (isset($_GET['chart']) ? $_GET['chart'] : null);
+if ($chart == 'scatter') {
+  $chartType = 'scatter';
+}
+elseif (in_array($chart, ['cote','volume','surface'])) {
+  $chartType = 'line';
+}
+else {
+  $chartType = 'MultiAxisLine';
+}
+
 $geojsonLayers = [ // liste des couches GeoJSON, variable utilisée dans le code JS
+  "Barrages extrait pour validation" => [
+    'path' => "geojson.php?file=retenues-20200121-Occitanie.csv",
+    'markerOptions' => [
+      'radius'=> 8,
+      'fillColor'=> "darkGreen",
+      'color'=> "#000",
+      'weight'=> 1,
+      'opacity'=> 1,
+      'fillOpacity'=> 0.8,
+    ],
+    'visibleByDefault' => true,
+    'graph'=> true,
+  ],
   "Barrages 15m France entière" => [
     'path' => "geojson.php?file=Barrages_15m_France_20200131.csv",
     'markerOptions' => [
@@ -81,7 +109,6 @@ $geojsonLayers = [ // liste des couches GeoJSON, variable utilisée dans le code
       'opacity'=> 1,
       'fillOpacity'=> 0.8,
     ],
-    'visibleByDefault' => true,
   ],
   "Barrages 15m Occitanie et Nelle Aquitaine" => [
     'path' => "geojson.php?file=Barrages_15m_Occitanie_NlAq_20200131.csv",
@@ -93,18 +120,6 @@ $geojsonLayers = [ // liste des couches GeoJSON, variable utilisée dans le code
       'opacity'=> 1,
       'fillOpacity'=> 0.8,
     ],
-  ],
-  "Barrages extrait pour validation" => [
-    'path' => "geojson.php?file=retenues-20200121-Occitanie.csv",
-    'markerOptions' => [
-      'radius'=> 8,
-      'fillColor'=> "darkGreen",
-      'color'=> "#000",
-      'weight'=> 1,
-      'opacity'=> 1,
-      'fillOpacity'=> 0.8,
-    ],
-    'graph'=> true,
   ],
 ];
 
@@ -149,8 +164,12 @@ var wmtsurl = 'https://wxs.ign.fr/choisirgeoportail/geoportail/wmts?'
 var attrIGN = "&copy; <a href='http://www.ign.fr'>IGN</a>";
 
 function genChart(chartDataSource) {
+  if (chartDataSource.error) {
+    alert(chartDataSource.error);
+    return;
+  }
   const chartConfig = {
-    type: 'MultiAxisLine',
+    type: '<?php echo $chartType;?>',
     renderAt: 'chart-container',
     width: '100%',
     height: '400',
@@ -164,7 +183,7 @@ function genChart(chartDataSource) {
 }
 
 function onLayerClick(e) {
-  fetch("<?php echo $path;?>/chart2.php?latlng="+e.latlng.lat+','+e.latlng.lng)
+  fetch("<?php echo $path;?>latlng="+e.latlng.lat+','+e.latlng.lng)
   .then(response => response.json())
   .then(response => genChart(response))
   .catch(error => alert("Erreur : " + error));
