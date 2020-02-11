@@ -5,12 +5,21 @@ title: map2.php - Dessine la carte et les graphiques dans la même fenêtre
 doc: |
   Prend en paramètres:
     - bbox rectangle englobant [ lonmin,latmin,lonmax,latmax ] à afficher (optionnel)
-  Affichage en 2 parties:
-    - une pour la carte
-    - une pour le graphique
-  Appel de chart2.php qui génère la définition du graphique en JSON
+    - lon,lat,level définissant le centre de l'affichage et le niveau de zoom
+    - chart défini le type de graphique affiché
+      - cote, volume, surface pour afficher une variable dans un graphique de type line
+      - MultiAxisLine pour afficher les 3 variables dans un graphique de type MultiAxisLine
+      - scatter pour afficher le volume en fonction de la côte dans un graphique de type scatter
+  Affichage en 2 <div>:
+    - 'map' pour la carte
+    - 'chart-container' pour les graphiques
+  Un clic sur un barrage de la couche des barrages pour validation affiche le graphique correspondant
+  au barrage dans la <div> 'chart-container'
+  Appel de chart2.php paramétré par les coords latlng du barrage génère la définition du graphique en JSON
+  à partir du fichier CSV.
+  Les variables Php utilisées dans le code Javascript sont listées au début du code Javascript.
 journal: |
-  7-9/2/2020:
+  7-11/2/2020:
     création
 */
 
@@ -48,24 +57,24 @@ function level(array $bbox): int {
   return $level;
 }
 
-if (isset($_GET['bbox'])) {
+if (isset($_GET['bbox'])) { // 
   $bbox = explode(',', $_GET['bbox']);
   //print_r($bbox); die();
   $lon = ($bbox[0]+$bbox[2])/2;
   $lat = ($bbox[1]+$bbox[3])/2;
-  $level = level($bbox); // variable utilisé dans le code JavaScript pour définir la vue
+  $level = level($bbox); // variable utilisée dans le code JavaScript pour définir la vue
 }
 elseif (isset($_GET['lon']) && isset($_GET['lat']) && isset($_GET['level'])) {
   $lon = floatval($_GET['lon']);
   $lat = floatval($_GET['lat']);
-  $level = intval($_GET['level']); // variable utilisé dans le code JavaScript pour définir la vue
+  $level = intval($_GET['level']); // variable utilisée dans le code JavaScript pour définir la vue
 }
 else  {
   $lon = 1;
   $lat = 45.5;
-  $level = 6; // variable utilisé dans le code JavaScript pour définir la vue
+  $level = 6; // variable utilisée dans le code JavaScript pour définir la vue
 }
-$center = json_encode([$lat, $lon]); // variable utilisé dans le code JavaScript pour définir la vue
+$center = json_encode([$lat, $lon]); // variable utilisée dans le code JavaScript pour définir la vue
 
 //echo "<pre>"; print_r($_SERVER); die;
 $path = (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) ? 'https://' : 'http://')
@@ -76,7 +85,7 @@ $path = (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) ? 'https://' : 'http://')
 //echo "path=$path<br>\n";
 $chart = (isset($_GET['chart']) ? $_GET['chart'] : null);
 if ($chart == 'scatter') {
-  $chartType = 'scatter';
+  $chartType = 'scatter'; // variable utilisée dans le code Javascript pour définir le type de graphique
 }
 elseif (in_array($chart, ['cote','volume','surface'])) {
   $chartType = 'line';
@@ -127,7 +136,7 @@ $geojsonLayers = [ // liste des couches GeoJSON, variable utilisée dans le code
 
 <!DOCTYPE HTML><html>
   <!-- carte simple utilisant les clés choisirgeoportail -->
-  <!-- code utilisant les variables Php $center $level $geojsonLayers -->
+  <!-- code utilisant les variables Php $center $level $geojsonLayers $chartType -->
   <head>
     <title>carte</title>
     <meta charset="UTF-8">
@@ -151,7 +160,8 @@ $geojsonLayers = [ // liste des couches GeoJSON, variable utilisée dans le code
         <div id="chart-container" style="height: 50%; width: 100%">
           </p>
           Cliquer sur un barrage de la couche "Barrages extrait pour validation"
-          pour afficher le graphique correspondant
+          pour afficher le graphique correspondant.<br>
+          Dans cette version seul le graphique du barrage de l'Astarac est disponible.
         </div>
     </center>
     <script>
@@ -163,6 +173,7 @@ var wmtsurl = 'https://wxs.ign.fr/choisirgeoportail/geoportail/wmts?'
             + 'tilematrix={z}&tilecol={x}&tilerow={y}';
 var attrIGN = "&copy; <a href='http://www.ign.fr'>IGN</a>";
 
+// génère le graphique en utilisant FusionCharts à partir des données passes en paramètre
 function genChart(chartDataSource) {
   if (chartDataSource.error) {
     alert(chartDataSource.error);
@@ -182,6 +193,8 @@ function genChart(chartDataSource) {
   });
 }
 
+// lorsque le clic est généré, appel de chart2.php avec le bon chemin et les coord. du barrage en paramètre
+// puis si ok appelle genChart() avc les données ainsi récupérées
 function onLayerClick(e) {
   fetch("<?php echo $path;?>latlng="+e.latlng.lat+','+e.latlng.lng)
   .then(response => response.json())
@@ -189,18 +202,21 @@ function onLayerClick(e) {
   .catch(error => alert("Erreur : " + error));
 }
 
+// associe au click le traitement onLayerClick() + associe un ToolTip à la couche
 var onEachFeatureGraph = function (feature, layer) {
   layer.on('click', onLayerClick);
   if (feature.properties.Nom)
     layer.bindTooltip(feature.properties.Nom);
 };
 
+// associe à la couche un popup + un ToolTip
 var onEachFeature = function (feature, layer) {
   layer.bindPopup('<pre>'+JSON.stringify(feature.properties,null,' ')+'</pre>');
   if (feature.properties.Nom)
     layer.bindTooltip(feature.properties.Nom);
 };
 
+// liste des couches de fond
 var baseLayers = {
   "Plan IGN V2" : new L.TileLayer(
       wmtsurl + '&layer=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&format=image/png&style=normal',
@@ -233,6 +249,7 @@ var baseLayers = {
   ),
 };
 
+// liste des calques
 var overlays = {
   "Hydrographie" : new L.TileLayer(
     'http://igngp.geoapi.fr/tile.php/hydrographie/{z}/{x}/{y}.png',
@@ -240,14 +257,14 @@ var overlays = {
       attribution: attrIGN
     }
   ),
-  "Parcelles cadastrales (orange)" : new L.TileLayer(
+  /*"Parcelles cadastrales (orange)" : new L.TileLayer(
       wmtsurl + '&layer=CADASTRALPARCELS.PARCELS&format=image/png&style=bdparcellaire_o',
       {"format":"image/png","minZoom":0,"maxZoom":20,"attribution":attrIGN}
   ),
   "BD Uni j+1" : new L.TileLayer(
       wmtsurl + '&layer=GEOGRAPHICALGRIDSYSTEMS.MAPS.BDUNI.J1&format=image/png&style=normal',
       {"format":"image/png","minZoom":0,"maxZoom":20,"attribution":attrIGN}
-  ),
+  ),*/
 <?php
   // affichage des couches GeoJSON définies dans la variable Php $geojsonLayers
   foreach ($geojsonLayers as $title => $layer) {
