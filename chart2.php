@@ -1,7 +1,7 @@
 <?php
 /*PhpDoc:
 name: chart2.php
-title: chart2.php - définition JSON graphique des données associées à un barrage
+title: chart2.php - définition JSON du graphique associé à un barrage
 doc:
   En premier paramètre obligatoire latlng est le couple de coordonnées géo. du barrage
   En second paramètre optionnel chart le type de graphique
@@ -22,47 +22,54 @@ journal: |
     génération JSON de la définition du graphique
 */
 
+// calcul de la distance entre 2 points définis en coord. géo.
 function dist(array $a, array $b): float {
   //print_r($a); print_r($b);
   return sqrt(($a[0]-$b[0]) ** 2 + ($a[1]-$b[1]) ** 2);
 }
 
+// trouve le nom du barrage à partir de ses coordonnées
+function nomBarrage(array $latlng): string {
+  $nom = null;
+  $distMin = -1;
+
+  if (!($file = fopen(__DIR__."/data/retenues-20200121-Occitanie.csv",'r'))) {
+    header('HTTP/1.1 400 Bad Request');
+    die("Erreur ouverture du fichier retenues-20200121-Occitanie.csv");
+  }
+
+  $header = fgetcsv($file, 1024, ';', '"');
+  while ($record = fgetcsv($file, 1024, ';', '"')) {
+    foreach ($header as $i => $k)
+      $rec[$k] = $record[$i];
+    //print_r($rec);
+    if (!is_numeric(str_replace(',','.',$rec['Lat'])) || !is_numeric(str_replace(',','.',$rec['Lon'])))
+      continue;
+    $d = dist($latlng, [str_replace(',','.',$rec['Lat']), str_replace(',','.',$rec['Lon'])]);
+    if (($distMin == -1) || ($d < $distMin)) {
+      $nom = $rec['Nom'];
+      $distMin = $d;
+    }
+  }
+  return $nom;
+}
+  
 if (!isset($_GET['latlng'])) {
   header('HTTP/1.1 400 Bad Request');
-  die("Erreur latlng non défini");
+  die("Erreur paramètre latlng non défini");
 }
 $latlng = explode(',', $_GET['latlng']);
 
-if (!($file = fopen(__DIR__."/data/retenues-20200121-Occitanie.csv",'r'))) {
-  header('HTTP/1.1 400 Bad Request');
-  die("Erreur ouverture du fichier retenues-20200121-Occitanie.csv");
-}
-
-$nom = null;
-$distMin = -1;
-
-$header = fgetcsv($file, 1024, ';', '"');
-while ($record = fgetcsv($file, 1024, ';', '"')) {
-  foreach ($header as $i => $k)
-    $rec[$k] = $record[$i];
-  //print_r($rec);
-  if (!is_numeric(str_replace(',','.',$rec['Lat'])) || !is_numeric(str_replace(',','.',$rec['Lon'])))
-    continue;
-  $d = dist($latlng, [str_replace(',','.',$rec['Lat']), str_replace(',','.',$rec['Lon'])]);
-  if (($distMin == -1) || ($d < $distMin)) {
-    $nom = $rec['Nom'];
-    $distMin = $d;
-  }
-}
-
 //$nom = 'Astarac';
+$nom = nomBarrage($latlng);
 
 if (!($file = @fopen(__DIR__."/data/retenue-$nom.csv",'r'))) {
   header('HTTP/1.1 404 Not Found');
   die(json_encode(['error'=> "Erreur ouverture du fichier retenue-$nom.csv"]));
 }
 
-fgetcsv($file, 1024, ';', '"'); // ligne avec le nom du barrage
+$first = fgetcsv($file, 1024, ';', '"'); // ligne avec le nom du barrage
+$bLabel = $first[0];
 $header = fgetcsv($file, 1024, ';', '"');
 
 $mesures = []; // [ date (jj/mm/aaaa) => [côte (m), volume (Mm3), surface (ha)]]
@@ -80,7 +87,7 @@ while ($record = fgetcsv($file, 1024, ';', '"')) {
 include __DIR__."/fusioncharts/fusioncharts.php";
 
 $chart = (isset($_GET['chart']) ? $_GET['chart'] : null);
-if (in_array($chart, ['cote','volume','surface'])) { // graphique de la côte du bassin
+if (in_array($chart, ['cote','volume','surface'])) { // graphique de la côte, du volume ou de la surface du bassin
   $yAxisNames = [
     'cote'=> "Côte du bassin (m)",
     'volume'=> "Volume (Mm3)",
@@ -89,7 +96,7 @@ if (in_array($chart, ['cote','volume','surface'])) { // graphique de la côte du
   // Chart Def
   $chartDef = [
     "chart" => [
-      "caption" => "Barrage de l'Astarac",
+      "caption" => $bLabel,
       //"subCaption" => "Last week",
       "xAxisName" => "Date",
       "yAxisName" => $yAxisNames[$chart],
@@ -117,15 +124,12 @@ if (in_array($chart, ['cote','volume','surface'])) { // graphique de la côte du
   }
 
   $chartDef['trendlines'][0]['line'][0]['startvalue'] = $sum/count($mesures);
-  
-  header('Content-type: application/json');
-  die(json_encode($chartDef));
 }
 elseif ($chart == 'scatter') { // volume / cote
   // Chart Def
   $chartDef = [
     "chart" => [
-      "caption" => "Barrage de l'Astarac",
+      "caption" => $bLabel,
       "subCaption" => "Volume vs. côte",
       "xAxisName" => "Côte du bassin (m)",
       "xnumbersuffix"=> "m",
@@ -145,15 +149,12 @@ elseif ($chart == 'scatter') { // volume / cote
   foreach ($mesures as $label => $values) {
     $chartDef['dataset'][0]["data"][] = ["x" => $values[0], "y" => $values[1]];
   }
-  
-  header('Content-type: application/json');
-  die(json_encode($chartDef));
 }
 else { // graphique avec les 3 variables
   // Chart Def
   $chartDef = [
     "chart" => [
-      "caption" => "Barrage de l'Astarac",
+      "caption" => $bLabel,
       //"subCaption" => "Last week",
       "xAxisName" => "Date",
       "theme" => "fusion"
@@ -195,8 +196,7 @@ else { // graphique avec les 3 variables
     $chartDef['axis'][2]['dataset'][0]['data'][] = ["value" => $values[2]];
     //if (++$count >= 5) break;
   }
-  
-  header('Content-type: application/json');
-  die(json_encode($chartDef));
 }
 
+header('Content-type: application/json');
+die(json_encode($chartDef));
